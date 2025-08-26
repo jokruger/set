@@ -28,6 +28,29 @@ func TestNew(t *testing.T) {
 	}
 }
 
+func TestNewFromMap(t *testing.T) {
+	m := make(map[int]string)
+	m[1] = "a"
+	m[2] = "b"
+	m[3] = "c"
+
+	s := NewFromMapKeys(m)
+	if s.Len() != 3 {
+		t.Error("Set should have length 3")
+	}
+	if !s.Contains(1) || !s.Contains(2) || !s.Contains(3) {
+		t.Error("Set should contain 1, 2, 3")
+	}
+
+	s2 := NewFromMapValues(m)
+	if s2.Len() != 3 {
+		t.Error("Set should have length 3")
+	}
+	if !s2.Contains("a") || !s2.Contains("b") || !s2.Contains("c") {
+		t.Error("Set should contain a, b, c")
+	}
+}
+
 func TestInts(t *testing.T) {
 	s := New[int](WithCapacity(10))
 	if s.Contains(42) {
@@ -483,7 +506,7 @@ func TestFilter(t *testing.T) {
 	}
 }
 
-func TestAllAnyCount(t *testing.T) {
+func TestPredicates(t *testing.T) {
 	s := NewFromElements(1, 2, 3, 4, 5)
 
 	if s.All(func(x int) bool { return x > 0 }) != true {
@@ -500,7 +523,25 @@ func TestAllAnyCount(t *testing.T) {
 		t.Error("There is no element equal to 10")
 	}
 
+	if s.None(func(x int) bool { return x == 10 }) != true {
+		t.Error("There is no element equal to 10")
+	}
+	if s.None(func(x int) bool { return x == 3 }) != false {
+		t.Error("There is an element equal to 3")
+	}
+
 	if s.Count(func(x int) bool { return x > 3 }) != 2 {
 		t.Error("There are two elements greater than 3")
+	}
+}
+
+func TestForEach(t *testing.T) {
+	s := NewFromElements(1, 2, 3)
+	sum := 0
+	s.ForEach(func(e int) {
+		sum += e
+	})
+	if sum != 6 {
+		t.Error("Sum should be 6")
 	}
 }

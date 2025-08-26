@@ -63,6 +63,24 @@ func NewFromSet[T comparable](source Set[T]) Set[T] {
 	return s
 }
 
+// NewFromMapKeys creates a new set with the keys of the map.
+func NewFromMapKeys[T comparable, V any](m map[T]V) Set[T] {
+	s := make(Set[T], len(m))
+	for k := range m {
+		s[k] = struct{}{}
+	}
+	return s
+}
+
+// NewFromMapValues creates a new set with the values of the map.
+func NewFromMapValues[T comparable, V comparable](m map[T]V) Set[V] {
+	s := make(Set[V], len(m))
+	for _, v := range m {
+		s[v] = struct{}{}
+	}
+	return s
+}
+
 // Len returns the number of elements in the set.
 func (s Set[T]) Len() int {
 	return len(s)
@@ -330,6 +348,16 @@ func (s Set[T]) Any(f func(T) bool) bool {
 	return false
 }
 
+// None returns true if no elements in set satisfy the predicate f.
+func (s Set[T]) None(f func(T) bool) bool {
+	for e := range s {
+		if f(e) {
+			return false
+		}
+	}
+	return true
+}
+
 // Count returns the number of elements in set that satisfy the predicate f.
 func (s Set[T]) Count(f func(T) bool) int {
 	count := 0
@@ -350,4 +378,11 @@ func (s Set[T]) Filter(f func(T) bool) Set[T] {
 		}
 	}
 	return res
+}
+
+// ForEach executes the function f for each element in the set.
+func (s Set[T]) ForEach(f func(T)) {
+	for e := range s {
+		f(e)
+	}
 }
