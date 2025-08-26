@@ -41,6 +41,19 @@ func TestInts(t *testing.T) {
 	if s.Contains(42) {
 		t.Error("Set should not contain 42")
 	}
+
+	if s.Add(123) != true {
+		t.Error("Adding 123 should return true")
+	}
+	if s.Add(123) != false {
+		t.Error("Adding 123 again should return false")
+	}
+	if s.Remove(123) != true {
+		t.Error("Removing 123 should return true")
+	}
+	if s.Remove(123) != false {
+		t.Error("Removing 123 again should return false")
+	}
 }
 
 func TestFromIntsSlice(t *testing.T) {
@@ -302,6 +315,11 @@ func TestEqualInts(t *testing.T) {
 	if s1.Equal(s3) {
 		t.Error("Sets should not be equal")
 	}
+
+	s4 := NewFromElements(1, 2, 4)
+	if s1.Equal(s4) {
+		t.Error("Sets should not be equal")
+	}
 }
 
 func TestCloneInts(t *testing.T) {
@@ -462,5 +480,27 @@ func TestFilter(t *testing.T) {
 	}
 	if !filtered.Contains(4) {
 		t.Error("Filtered set should contain 4")
+	}
+}
+
+func TestAllAnyCount(t *testing.T) {
+	s := NewFromElements(1, 2, 3, 4, 5)
+
+	if s.All(func(x int) bool { return x > 0 }) != true {
+		t.Error("All elements are greater than 0")
+	}
+	if s.All(func(x int) bool { return x < 5 }) != false {
+		t.Error("Not all elements are less than 5")
+	}
+
+	if s.Any(func(x int) bool { return x == 3 }) != true {
+		t.Error("There is an element equal to 3")
+	}
+	if s.Any(func(x int) bool { return x == 10 }) != false {
+		t.Error("There is no element equal to 10")
+	}
+
+	if s.Count(func(x int) bool { return x > 3 }) != 2 {
+		t.Error("There are two elements greater than 3")
 	}
 }
